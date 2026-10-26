@@ -1,0 +1,7 @@
+law_oc.txt
+mcp_key.txt
+dist/
+*.tar
+*.log
+.git/
+deploy/

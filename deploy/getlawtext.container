@@ -1,0 +1,30 @@
+# /etc/containers/systemd/getlawtext.container   (Podman Quadlet, RHEL 9.6)
+# 적용: systemctl daemon-reload && systemctl start getlawtext
+[Unit]
+Description=Korean Law MCP server (getlawtext)
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+Image=localhost/getlawtext:1.0
+ContainerName=getlawtext
+# 리버스 프록시가 같은 서버에 있으면 127.0.0.1 에만 엽니다.
+# 프록시가 다른 서버면 127.0.0.1: 를 빼고(PublishPort=8087:8087) 방화벽으로 프록시 IP만 허용하세요.
+PublishPort=127.0.0.1:8087:8087
+EnvironmentFile=/etc/getlawtext/getlawtext.env
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+HealthCmd=python3.12 -c "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8087/health',timeout=4)"
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=10s
+LogDriver=journald
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target
